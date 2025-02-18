@@ -5,6 +5,17 @@
 <img align="left" src="https://i.redd.it/h7dae4o0uk461.jpg" alt="Bakaguya made by レヴィノス (https://www.pixiv.net/en/artworks/80962527)" width="320" /> 
 
 ```csharp
+Neofetch
+-------------------------
+OS: Arch Linux x86_64
+Shell: zsh 5.8
+Pronouns: He/him
+Languages: JavaScript,
+           HTML, CSS, LUA, Python.
+Hobbies: Gaming, Coding, Relaxing
+Commits: {{ totalCommitsInPastYear }}
+Stars: {{ totalStars }}
+Discord: louise_bourgoin
 ```
 <p align="left">
   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
