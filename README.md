@@ -2,7 +2,7 @@
 > NeoFetch
 ```
 
-<img align="left" src="https://i.pximg.net/img-original/img/2022/07/14/18/06/48/99718704_p0.png" alt="Bakaguya made by レヴィノス (https://www.pixiv.net/en/artworks/99718704)" width="320" /> 
+<img align="left" src="https://i.pximg.net/99718704_p0.png" alt="Bakaguya made by レヴィノス (https://www.pixiv.net/en/artworks/99718704)" width="320" /> 
 
 ```csharp
 Neofetch
