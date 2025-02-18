@@ -2,7 +2,7 @@
 > NeoFetch
 ```
 
-<img align="left" src="https://www.reddit.com/media?url=https%3A%2F%2Fpreview.redd.it%2Fix7b39x662t71.jpg%3Fwidth%3D450%26format%3Dpjpg%26auto%3Dwebp%26s%3D0e7640923f0b1337abd31f82bd2c3da0b8afc5c0" alt="Bakaguya made by レヴィノス (https://www.pixiv.net/en/artworks/99718704)" width="320" /> 
+<img align="left" src="https://i.redd.it/h7dae4o0uk461.jpg" alt="Bakaguya made by レヴィノス (https://www.pixiv.net/en/artworks/80962527)" width="320" /> 
 
 ```csharp
 Neofetch
