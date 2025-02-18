@@ -2,7 +2,7 @@
 > NeoFetch
 ```
 
-<img align="left" src="https://i.redd.it/h7dae4o0uk461.jpg" alt="Bakaguya made by レヴィノス (https://www.pixiv.net/en/artworks/80962527)" width="320" /> 
+<img align="left" src="https://i.redd.it/h7dae4o0uk461.jpg" alt="Bakaguya made by レヴィノス ([https://www.pixiv.net/en/artworks/80962527](https://www.pixiv.net/en/artworks/99718704))" width="320" /> 
 
 ```csharp
 Neofetch
@@ -13,9 +13,7 @@ Pronouns: He/him
 Languages: JavaScript,
            HTML, CSS, LUA, Python.
 Hobbies: Gaming, Coding, Relaxing
-Commits: {{ totalCommitsInPastYear }}
-Stars: {{ totalStars }}
-Discord: louise_bourgoin
+Discord: louise_bourgoin / Finn :D
 ```
 <p align="left">
   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
