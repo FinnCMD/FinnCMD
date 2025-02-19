@@ -8,7 +8,6 @@
 Neofetch
 -------------------------
 OS: Windows 11
-Shell: zsh 5.8
 Pronouns: He/him
 Languages: JavaScript,
            HTML, CSS, LUA, Python.
