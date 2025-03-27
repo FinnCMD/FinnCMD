@@ -12,5 +12,5 @@ Pronouns: He/him
 Languages: JavaScript,
            HTML, CSS, LUA, Python.
 Hobbies: Gaming, Coding, Relaxing
-Discord: louise_bourgoin / Finn :D
+Discord: femboy_finn. / Finn :D
 ```
