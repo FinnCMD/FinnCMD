@@ -1,97 +1,108 @@
 require("dotenv").config();
 const Mustache = require("mustache");
 const fs = require("fs").promises;
+const path = require("path");
 const { Octokit } = require("@octokit/rest");
 
 const octokit = new Octokit({
   auth: process.env.GH_ACCESS_TOKEN,
-  userAgent: "readme v1.0.0",
-  baseUrl: "https://api.github.com",
-  log: {
-    warn: console.warn,
-    error: console.error,
-  },
+  userAgent: "readme-upgrader v2.0.0",
 });
 
-// Grab all repositories for authenticated user
-async function grabDataFromAllRepositories() {
-  try {
-    const response = await octokit.rest.repos.listForAuthenticatedUser({ per_page: 100 });
-    return response.data;
-  } catch (err) {
-    console.error("Failed to fetch repositories:", err);
-    return [];
+const CACHE_FILE = path.resolve(__dirname, "repo_cache.json");
+
+// Fetch all repositories with pagination
+async function grabAllRepositories() {
+  let page = 1;
+  let repos = [];
+  while (true) {
+    const response = await octokit.rest.repos.listForAuthenticatedUser({
+      per_page: 100,
+      page,
+    });
+    repos = repos.concat(response.data);
+    if (response.data.length < 100) break; // no more pages
+    page++;
   }
+  console.log(`Fetched ${repos.length} repositories`);
+  return repos;
 }
 
-// Calculate total stars across all repos
+// Calculate total stars
 function calculateTotalStars(data) {
   return data.reduce((sum, repo) => sum + repo.stargazers_count, 0);
 }
 
-// Calculate total commits with optional cutoffDate
-async function calculateTotalCommits(data, cutoffDate) {
-  const githubUsername = process.env.GH_USERNAME;
-  const contributorsRequests = [];
-
-  data.forEach((repo) => {
-    const lastRepoUpdate = new Date(repo.updated_at);
-    if (!cutoffDate || lastRepoUpdate > cutoffDate) {
-      contributorsRequests.push(
-        octokit.rest.repos.getContributorsStats({
-          owner: githubUsername,
-          repo: repo.name,
-        })
-      );
+// Fetch contributor stats with retry for 202 Accepted
+async function getContributorStats(owner, repo) {
+  for (let i = 0; i < 5; i++) { // retry up to 5 times
+    const stats = await octokit.rest.repos.getContributorsStats({ owner, repo });
+    if (stats.status === 202) {
+      console.log(`Stats for ${repo} not ready. Retrying...`);
+      await new Promise((r) => setTimeout(r, 1000));
+    } else {
+      return stats.data;
     }
-  });
-
-  return getTotalCommits(contributorsRequests, githubUsername, cutoffDate);
+  }
+  return [];
 }
 
-// Aggregate commits from multiple repos
-async function getTotalCommits(requests, contributor, cutoffDate) {
+// Calculate total commits optionally filtered by cutoffDate
+async function calculateTotalCommits(repos, cutoffDate) {
+  const githubUsername = process.env.GH_USERNAME;
   let totalCommits = 0;
 
-  const repos = await Promise.all(requests.map((req) => req.catch(() => ({ data: [] }))));
+  for (const repo of repos) {
+    const lastRepoUpdate = new Date(repo.updated_at);
+    if (cutoffDate && lastRepoUpdate <= cutoffDate) continue;
 
-  repos.forEach((repo) => {
-    const index = repo.data.findIndex((item) => item.author?.login === contributor);
-    if (index !== -1) {
-      const contributorStats = repo.data[index];
-      totalCommits += !cutoffDate
-        ? contributorStats.total
-        : computeCommitsBeforeCutoff(contributorStats, cutoffDate);
+    console.log(`Processing commits for ${repo.name}...`);
+    const contributorData = await getContributorStats(githubUsername, repo.name);
+
+    const userStats = contributorData.find((item) => item.author?.login === githubUsername);
+    if (!userStats) continue;
+
+    if (!cutoffDate) {
+      totalCommits += userStats.total;
+    } else {
+      totalCommits += userStats.weeks
+        .filter((week) => new Date(week.w * 1000) > cutoffDate)
+        .reduce((sum, week) => sum + week.c, 0);
     }
-  });
+  }
 
   return totalCommits;
 }
 
-// Count commits before a cutoff date
-function computeCommitsBeforeCutoff(contributorData, cutoffDate) {
-  const MILLISECONDS_IN_A_SECOND = 1000;
-
-  return contributorData.weeks
-    .filter((week) => new Date(week.w * MILLISECONDS_IN_A_SECOND) > cutoffDate)
-    .reduce((sum, week) => sum + week.c, 0);
+// Update README using Mustache template
+async function updateReadme(userData) {
+  const template = await fs.readFile("./main.mustache", "utf-8");
+  const output = Mustache.render(template, userData);
+  await fs.writeFile("README.md", output, "utf-8");
+  console.log("README.md updated successfully!");
 }
 
-// Update README from Mustache template
-async function updateReadme(userData) {
+// Cache helpers
+async function loadCache() {
   try {
-    const template = await fs.readFile("./main.mustache", "utf-8");
-    const output = Mustache.render(template, userData);
-    await fs.writeFile("README.md", output, "utf-8");
-    console.log("README.md updated successfully!");
-  } catch (err) {
-    console.error("Failed to update README:", err);
+    const data = await fs.readFile(CACHE_FILE, "utf-8");
+    return JSON.parse(data);
+  } catch {
+    return null;
   }
 }
 
-// Main entry point
+async function saveCache(data) {
+  await fs.writeFile(CACHE_FILE, JSON.stringify(data, null, 2), "utf-8");
+}
+
+// Main
 async function main() {
-  const repoData = await grabDataFromAllRepositories();
+  let repoData = await loadCache();
+  if (!repoData) {
+    repoData = await grabAllRepositories();
+    await saveCache(repoData);
+  }
 
   const totalStars = calculateTotalStars(repoData);
 
