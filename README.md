@@ -6,12 +6,12 @@
 
 
 ```csharp
-Sprixer / Fynnie
+Konnie
 -------------------------
 OS: Nyarch Linux
-Pronouns: He/him
+Pronouns: She/her
 Languages: JavaScript,
            HTML, CSS, LUA, Python.
 Hobbies: Gaming, Coding, Relaxing
-Discord: femboy_finn. / Fynnie
+Discord: femboy_finn. / Konnie
 ```
